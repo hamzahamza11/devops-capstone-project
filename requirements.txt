@@ -30,3 +30,9 @@ httpie==3.2.1
 
 # Other dependencies...
 Flask-Cors==3.0.10
+
+# Other dependencies...
+Flask-Talisman==0.8.1  # Or whichever version is suitable
+
+
+
