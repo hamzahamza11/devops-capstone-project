@@ -14,6 +14,7 @@ spec:
       image: alpine:3
       command: [/bin/echo]
       args: ["$(params.message)"]
+
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -38,9 +39,6 @@ spec:
         set -eu
         echo "Removing all files from ${WORKSPACE_SOURCE_PATH} ..."
         # Delete any existing contents of the directory if it exists.
-        #
-        # We don't just "rm -rf ${WORKSPACE_SOURCE_PATH}" because ${WORKSPACE_SOURCE_PATH} might be "/"
-        # or the root of a mounted volume.
         if [ -d "${WORKSPACE_SOURCE_PATH}" ] ; then
           # Delete non-hidden files and directories
           rm -rf "${WORKSPACE_SOURCE_PATH:?}"/*
@@ -50,3 +48,26 @@ spec:
           rm -rf "${WORKSPACE_SOURCE_PATH}"/..?*
         fi
 
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: flake8-lint
+spec:
+  description: This task will lint code using flake8.
+  params:
+    - name: image
+      description: The container image to use for linting
+      type: string
+      default: "python:3.9-slim"
+    - name: args
+      description: Arguments to pass to the flake8 linter
+      type: array
+      default: ["--count", "--max-complexity=10", "--max-line-length=127", "--statistics"]
+  workspaces:
+    - name: source
+  steps:
+    - name: lint
+      image: $(params.image)
+      script: "flake8 $(params.args)"
+      workingDir: $(workspaces.source.path)
