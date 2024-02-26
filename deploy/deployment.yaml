@@ -21,4 +21,11 @@ spec:
       - image: us.icr.io/sn-labs-sabirha00/accounts:1
         name: accounts
         resources: {}
+
+  spec:
+    template:
+      spec:
+        containers:
+        - image: image-registry.openshift-image-registry.svc:5000/$SN_ICR_NAMESPACE/accounts:latest
+          name: accounts
 status: {}
